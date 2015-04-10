@@ -88,9 +88,7 @@
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if(error != nil) {
-                #ifdef DEBUG_WS
-                    [self _debugResponse:data];
-                #endif
+                [self _debugResponse:data];
                 DLog(@"%@", error);
                 [subscriber sendError:error];
             } else if (data == nil) {
@@ -139,13 +137,15 @@
 }
 
 - (void) _debugResponse: (NSData*) data {
-    @try {
-        NSString *s = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        DLog(@"%@", s);
-    }
-    @catch (NSException *exception) {
-        DLog(@"%@", exception.description);
-    }
+    #ifdef DEBUG_WS
+        @try {
+            NSString *s = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            DLog(@"%@", s);
+        }
+        @catch (NSException *exception) {
+            DLog(@"%@", exception.description);
+        }
+    #endif
 }
 
 @end
