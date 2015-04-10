@@ -117,10 +117,10 @@
         NSError* error;
         NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         if (error != nil) {
+            [subscriber sendError:error];
+        } else {
             [subscriber sendNext:jsonDict];
             [subscriber sendCompleted];
-        } else {
-            [subscriber sendError:error];
         }
         return nil;
     }];
