@@ -5,11 +5,10 @@
 //  Created by Balazs Perlaki-Horvath on 10/04/2015.
 //
 //
-
+#import "WebServiceCommon.h"
 #import "WebServiceRAC.h"
 #import "LocalCache.h"
 #import "WSHelper.h"
-#import "WebServiceCommon.h"
 #import <ReactiveCocoa/ReactiveCocoa.h>
 
 @implementation WebServiceRAC
@@ -71,20 +70,21 @@
 }
 
 - (RACSignal *) _getSignalCachedData:(NSString *) callID {
-    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+    return [[[RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         NSData *data = [_cache getDataFor:_callID];
         [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonDict) {
+            DLog(@"cached data: ");
             [subscriber sendNext:jsonDict];
         } error:^(NSError *error) {
             [subscriber sendError:error];
         }];
         [subscriber sendCompleted];
         return nil;
-    }];
+    }] subscribeOn:[RACScheduler scheduler]] deliverOnMainThread];
 }
 
 - (RACSignal* ) _getSignalRequestCall: (NSURLRequest *) request {
-    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+    return [[[RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if(error != nil) {
@@ -101,6 +101,7 @@
                 [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonDict) {
                     [subscriber sendNext:jsonDict];
                 } error:^(NSError *error) {
+                    [self _debugResponse:data];
                     [subscriber sendError:error];
                 }];
             }
@@ -109,7 +110,7 @@
         return [RACDisposable disposableWithBlock:^{
             [task cancel];
         }];
-    }];
+    }] subscribeOn:[RACScheduler scheduler]] deliverOnMainThread];
 }
 
 - (RACSignal*) _getJSONFrom: (NSData*) data {

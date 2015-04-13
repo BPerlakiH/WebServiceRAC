@@ -29,10 +29,13 @@
     if(method == nil) {
         return nil;
     }
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: [NSURL URLWithString: baseURL]];
+    NSURL *fullURL = [WSHelper getFullURL:baseURL and:parameters];
+    fullURL = [fullURL URLByAppendingPathComponent:method];
+    NSLog(@"Webservice call to POST: %@", fullURL.absoluteString);
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: fullURL];
     [request setHTTPMethod: @"POST"];
-    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-    [request setHTTPBody: [WSHelper toJSONData:parameters]];
+//    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+//    [request setHTTPBody: [WSHelper toJSONData:parameters]];
     [request setTimeoutInterval:20];
     if(isBackgroundMode) {
         [request setNetworkServiceType:NSURLNetworkServiceTypeBackground];
@@ -69,15 +72,17 @@
 + (NSURL*) getFullURL: (NSString *) baseURL and: (NSDictionary *) parameters {
     NSURLComponents *components = [NSURLComponents componentsWithString:baseURL];
     NSMutableArray *queryItems = [NSMutableArray array];
-    for (NSString *key in parameters) {
-        NSString *valueString;
-        id valueObj = [parameters objectForKey:key];
-        if ([valueObj  isKindOfClass:[NSString class]]) {
-            valueString = valueObj;
-        } else if ([valueObj respondsToSelector:@selector(stringValue)]) {
-            valueString = [valueObj stringValue];
+    if(parameters != nil) {
+        for (NSString *key in parameters) {
+            NSString *valueString;
+            id valueObj = [parameters objectForKey:key];
+            if ([valueObj  isKindOfClass:[NSString class]]) {
+                valueString = valueObj;
+            } else if ([valueObj respondsToSelector:@selector(stringValue)]) {
+                valueString = [valueObj stringValue];
+            }
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:valueString]];
         }
-        [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:valueString]];
     }
     components.queryItems = queryItems;
     NSURL *url = components.URL;

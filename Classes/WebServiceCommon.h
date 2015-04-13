@@ -10,6 +10,10 @@
 
     #define Pods_WebServiceCommon_h
 
+//    #define USE_CACHE false
+
+    #define DEBUG_WS true
+
     #ifndef DLog
         #ifdef DEBUG
             #define DLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
