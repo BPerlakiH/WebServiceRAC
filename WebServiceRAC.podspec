@@ -5,7 +5,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "WebServiceRAC"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "WebService wrapper with local cache for the Reactive world of Cocoa"
   s.description  = <<-DESC
                    WebService wrapper using JSON format with a Reactive implementation,
