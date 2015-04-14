@@ -29,13 +29,15 @@
     if(method == nil) {
         return nil;
     }
-    NSURL *fullURL = [WSHelper getFullURL:baseURL and:parameters];
-    fullURL = [fullURL URLByAppendingPathComponent:method];
+    NSURL *fullURL = [[NSURL URLWithString:baseURL] URLByAppendingPathComponent:method];
+//    NSURL *fullURL = [WSHelper getFullURL:baseURL and:parameters];
+//    fullURL = [fullURL URLByAppendingPathComponent:method];
     NSLog(@"Webservice call to POST: %@", fullURL.absoluteString);
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: fullURL];
     [request setHTTPMethod: @"POST"];
 //    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
-//    [request setHTTPBody: [WSHelper toJSONData:parameters]];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody: [WSHelper toJSONData:parameters]];
     [request setTimeoutInterval:20];
     if(isBackgroundMode) {
         [request setNetworkServiceType:NSURLNetworkServiceTypeBackground];

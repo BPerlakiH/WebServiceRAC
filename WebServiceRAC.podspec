@@ -5,7 +5,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "WebServiceRAC"
-  s.version      = "0.0.3"
+  s.version      = "0.0.4"
   s.summary      = "WebService wrapper with local cache for the Reactive world of Cocoa"
   s.description  = <<-DESC
                    WebService wrapper using JSON format with a Reactive implementation,
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.license = "MIT"
   s.author = "BPH"
   s.platform = :ios, "7.0"
-  s.source       = { :git => "https://github.com/BPerlakiH/WebServiceRAC.git", :tag => "0.0.3" }
+  s.source       = { :git => "https://github.com/BPerlakiH/WebServiceRAC.git", :tag => "0.0.4" }
 
   s.source_files  = "Classes", "Classes/**/*.{h,m}"
   s.exclude_files = "Classes/Exclude"
