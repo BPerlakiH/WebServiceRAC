@@ -63,7 +63,6 @@
     if(!isPost && useCache && [_cache isDataFor:_callID]) {
         return [self _getSignalCachedData: _callID];
     }
-    
 
     NSURLRequest *request = [self _getRequestFor:method and:parameters with:isPost];
     return [self _getSignalRequestCall:request];
@@ -97,9 +96,11 @@
                 if(![request.HTTPMethod isEqualToString:@"POST"] && useCache && ![_cache isDataFor:_callID]) {
                     [_cache writeData:data withKey:_callID];
                 }
-                
-                [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonDict) {
-                    [subscriber sendNext:jsonDict];
+                [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonData) {
+                    NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionaryWithDictionary:jsonData];
+                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+                    [jsonDictionary setValue:@([httpResponse statusCode]) forKey:@"_statusCode"];
+                    [subscriber sendNext:jsonDictionary];
                 } error:^(NSError *error) {
                     [self _debugResponse:data];
                     [subscriber sendError:error];
