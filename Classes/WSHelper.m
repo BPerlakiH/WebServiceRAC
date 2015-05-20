@@ -49,8 +49,9 @@
     if(method == nil) {
         return nil;
     }
-    NSURL *fullURL = [WSHelper getFullURL:baseURL and:parameters];
-    fullURL = [fullURL URLByAppendingPathComponent:method];
+    NSString *methodString = [baseURL stringByAppendingPathComponent:method];
+    NSURL *fullURL = [WSHelper getRequestUrl:methodString params:parameters];
+    
     NSLog(@"Webservice call to GET: %@", fullURL.absoluteString);
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: fullURL];
     [request setHTTPMethod: @"GET"];
@@ -71,24 +72,27 @@
     }
 }
 
-+ (NSURL*) getFullURL: (NSString *) baseURL and: (NSDictionary *) parameters {
-    NSURLComponents *components = [NSURLComponents componentsWithString:baseURL];
-    NSMutableArray *queryItems = [NSMutableArray array];
-    if(parameters != nil) {
-        for (NSString *key in parameters) {
-            NSString *valueString;
-            id valueObj = [parameters objectForKey:key];
-            if ([valueObj  isKindOfClass:[NSString class]]) {
-                valueString = valueObj;
-            } else if ([valueObj respondsToSelector:@selector(stringValue)]) {
-                valueString = [valueObj stringValue];
-            }
-            [queryItems addObject:[NSURLQueryItem queryItemWithName:key value:valueString]];
++ (NSURL*) getRequestUrl: (NSString*) url params: (NSDictionary *) parameters {
+    NSMutableString *urlWithQuerystring = [[NSMutableString alloc] initWithString:url];
+    
+    for (id key in parameters) {
+        NSString *keyString = [key description];
+        NSString *valueString = [[parameters objectForKey:key] description];
+        
+        if ([urlWithQuerystring rangeOfString:@"?"].location == NSNotFound) {
+            [urlWithQuerystring appendFormat:@"?%@=%@", [WSHelper urlEscapeString:keyString], [WSHelper urlEscapeString:valueString]];
+        } else {
+            [urlWithQuerystring appendFormat:@"&%@=%@", [WSHelper urlEscapeString:keyString], [WSHelper urlEscapeString:valueString]];
         }
     }
-    components.queryItems = queryItems;
-    NSURL *url = components.URL;
-    return url;
+    return [NSURL URLWithString: urlWithQuerystring];
+}
+
++ (NSString*) urlEscapeString:(NSString *)unencodedString {
+    CFStringRef originalStringRef = (__bridge_retained CFStringRef)unencodedString;
+    NSString *s = (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,originalStringRef, NULL, NULL,kCFStringEncodingUTF8);
+    CFRelease(originalStringRef);
+    return s;
 }
 
 
