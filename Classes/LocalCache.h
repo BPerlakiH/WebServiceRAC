@@ -15,8 +15,8 @@
 #   define CACHE_FOR_DAYS 7
 #endif
 
-#ifndef CACHE_PREFIX
-#   define CACHE_PREFIX @"General"
+#ifndef CACHE_PREFIX_GENERAL
+#   define CACHE_PREFIX_GENERAL @"General"
 #endif
 
 
@@ -39,5 +39,8 @@
 - (void) setCacheTimeInDays: (int) days;
 
 - (void) clearCache;
+
++ (NSString *) getPrefix;
++ (void) setPrefix: (NSString*) prefix;
 
 @end

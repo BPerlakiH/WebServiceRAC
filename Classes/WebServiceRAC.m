@@ -18,7 +18,7 @@
 - (id)initWithUrl: (NSString *)url {
     if(self = [super init]) {
         _baseUrl = url;
-        _cache = [[LocalCache alloc] initWith: [NSString stringWithFormat:@"webservice.%@", CACHE_PREFIX]];
+        _cache = [[LocalCache alloc] initWith: [LocalCache getPrefix]];
         useCache = true;
         isBackgroundMode = false;
     }
@@ -93,10 +93,10 @@
             } else if (data == nil) {
                 [subscriber sendError:[NSError errorWithDomain:@"WebserviceRAC" code:1 userInfo:@{NSLocalizedDescriptionKey: @"data nil"}]];
             } else {
-                if(![request.HTTPMethod isEqualToString:@"POST"] && useCache && ![_cache isDataFor:_callID]) {
-                    [_cache writeData:data withKey:_callID];
-                }
                 [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonData) {
+                    if(![request.HTTPMethod isEqualToString:@"POST"] && useCache && ![_cache isDataFor:_callID]) {
+                        [_cache writeData:data withKey:_callID];
+                    }
                     NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionaryWithDictionary:jsonData];
                     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
                     [jsonDictionary setValue:@([httpResponse statusCode]) forKey:@"_statusCode"];
@@ -117,9 +117,13 @@
 - (RACSignal*) _getJSONFrom: (NSData*) data {
     return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         NSError* error;
-        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        id jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
         if (error != nil) {
             [subscriber sendError:error];
+            [subscriber sendCompleted];
+        } else if (![jsonDict isKindOfClass:[NSDictionary class]]) {
+            [subscriber sendError:[NSError errorWithDomain:@"WebserviceRAC" code:2 userInfo:@{NSLocalizedDescriptionKey: @"response cannot be converted to NSDictionary"}]];
+            [subscriber sendCompleted];
         } else {
             [subscriber sendNext:jsonDict];
             [subscriber sendCompleted];

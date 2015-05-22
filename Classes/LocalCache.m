@@ -17,6 +17,20 @@
 
 @synthesize diskCachePath = _diskCachePath, cacheTime = _cacheTime;
 
+static NSString* _prefix;
+
++ (void)setPrefix:(NSString *)prefix {
+    _prefix = prefix;
+}
+
++ (NSString *)getPrefix {
+    if (_prefix == nil) {
+        return CACHE_PREFIX_GENERAL;
+    } else {
+        return _prefix;
+    }
+}
+
 - (id)initWith:(NSString *)prefix {
     if ((self = [super init])) {
         _prefix = prefix;
