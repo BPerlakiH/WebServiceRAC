@@ -14,6 +14,7 @@
 @implementation WebServiceRAC
 
 @synthesize isBackgroundMode, useCache;
+static NSHTTPCookieStorage *storage = nil;
 
 - (id)initWithUrl: (NSString *)url {
     if(self = [super init]) {
@@ -23,6 +24,10 @@
         isBackgroundMode = false;
     }
     return self;
+}
+
++ (void)setHttpCookieStorage:(NSHTTPCookieStorage *) cookieStorage {
+    storage = cookieStorage;
 }
 
 - (NSString *)getLastCallID {
@@ -85,6 +90,10 @@
 - (RACSignal* ) _getSignalRequestCall: (NSURLRequest *) request {
     return [[[RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         NSURLSession *session = [NSURLSession sharedSession];
+        if(storage != nil) {
+            NSURLSessionConfiguration *conf = [NSURLSessionConfiguration defaultSessionConfiguration];
+            [conf setHTTPCookieStorage:storage];
+        }
         NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if(error != nil) {
                 [self _debugResponse:data];

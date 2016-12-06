@@ -5,7 +5,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "WebServiceRAC"
-  s.version      = "0.0.4"
+  s.version      = "0.0.5"
   s.summary      = "WebService wrapper with local cache for the Reactive world of Cocoa"
   s.description  = <<-DESC
                    WebService wrapper using JSON format with a Reactive implementation,
@@ -22,9 +22,7 @@ Pod::Spec.new do |s|
   s.exclude_files = "Classes/Exclude"
 
   s.frameworks = "Foundation"
-  #s.libraries = "commonCrypto", "corecrypto"
 
   s.requires_arc = true
-  # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   s.dependency "ReactiveCocoa", "~> 2.3"
 end

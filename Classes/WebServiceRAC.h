@@ -18,6 +18,8 @@
 
 @property BOOL useCache, isBackgroundMode;
 
++ (void) setHttpCookieStorage: (NSHTTPCookieStorage *) cookieStorage;
+
 - (id) initWithUrl: (NSString *) url;
 - (NSString *) getLastCallID;
 - (LocalCache*) getCache;
