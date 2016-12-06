@@ -19,7 +19,7 @@ static NSHTTPCookieStorage *storage = nil;
 - (id)initWithUrl: (NSString *)url {
     if(self = [super init]) {
         _baseUrl = url;
-        _cache = [[LocalCache alloc] initWith: [NSString stringWithFormat:@"webservice.%@", CACHE_PREFIX]];
+        _cache = [[LocalCache alloc] initWith: [LocalCache getPrefix]];
         useCache = true;
         isBackgroundMode = false;
     }
