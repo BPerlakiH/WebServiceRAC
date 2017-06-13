@@ -108,8 +108,14 @@ static NSHTTPCookieStorage *storage = nil;
                 [[self _getJSONFrom:data] subscribeNext:^(NSDictionary *jsonData) {
                     NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionaryWithDictionary:jsonData];
                     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-                    [jsonDictionary setValue:@([httpResponse statusCode]) forKey:@"_statusCode"];
-                    [subscriber sendNext:jsonDictionary];
+                    NSInteger statusCode = [httpResponse statusCode];
+                    if(200 <= statusCode && statusCode < 300) {
+                        [jsonDictionary setValue:@([httpResponse statusCode]) forKey:@"_statusCode"];
+                        [subscriber sendNext:jsonDictionary];
+                    } else {
+                        [self _debugResponse:data];
+                        [subscriber sendError:[NSError errorWithDomain:@"WebserviceRAC" code:statusCode userInfo:jsonData]];
+                    }
                 } error:^(NSError *error) {
                     [self _debugResponse:data];
                     [subscriber sendError:error];
